@@ -4,16 +4,20 @@
 # NAT Gateway
 # Elastic IP
 
+
 # VPC
 resource "aws_vpc" "vpc" {
   cidr_block = var.vpc_cidr_block
 
-  // instances with a public IP address receive corresponding public DNS hostnames
+  // if true, queueries the AWS DNS server at 169.254.169.253
   enable_dns_hostnames = true
+
+  // if true, assign public hostname to EC2 instance if it is public
   enable_dns_support   = true
 
   tags = var.default_tags
 }
+
 
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
@@ -22,8 +26,9 @@ resource "aws_internet_gateway" "igw" {
   tags = var.default_tags
 }
 
-# Routing Table
-resource "aws_route_table" "rt" {
+
+# Routing Table for Internet Gateway
+resource "aws_route_table" "rt-igw" {
   vpc_id = aws_vpc.vpc.id
   route {
     cidr_block = "0.0.0.0/0"
@@ -31,4 +36,35 @@ resource "aws_route_table" "rt" {
   }
 
   tags = var.default_tags
+}
+
+
+# Elastic IP (EIP) as you cannot launch NAT Gateway without EIP address associated with it 
+resource "aws_eip" "nat-eip" {
+  vpc = true
+
+  tags = var.default_tags
+}
+
+
+# NAT (network address translation) Gateway
+# allows instances in the private subnets to connect to the internet
+# the NAT Gateway must be in the public subnet
+resource "aws_nat_gateway" "nat-gw" {
+  allocation_id = aws_eip.nat-eip.id
+  subnet_id = aws_subnet.public-subnet.id
+
+  tags = var.default_tags
+}
+
+
+# Route table for NAT Gateway
+resource "aws_route_table" "rt-nat" {
+  vpc_id = aws_vpc.vpc.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat-gw.id
+  }
+
+  tags = var.default_tags  
 }
