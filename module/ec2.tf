@@ -14,6 +14,7 @@ resource "aws_security_group" "ec2-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
+    description = "SSH"
   }
 
   egress {
