@@ -13,7 +13,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   // if true, assign public hostname to EC2 instance if it is public
-  enable_dns_support   = true
+  enable_dns_support = true
 
   tags = var.default_tags
 }
@@ -52,7 +52,7 @@ resource "aws_eip" "nat-eip" {
 # the NAT Gateway must be in the public subnet
 resource "aws_nat_gateway" "nat-gw" {
   allocation_id = aws_eip.nat-eip.id
-  subnet_id = aws_subnet.public-subnet.id
+  subnet_id     = aws_subnet.public-subnet.id
 
   tags = var.default_tags
 }
@@ -62,9 +62,9 @@ resource "aws_nat_gateway" "nat-gw" {
 resource "aws_route_table" "rt-nat" {
   vpc_id = aws_vpc.vpc.id
   route {
-    cidr_block = "0.0.0.0/0"
+    cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat-gw.id
   }
 
-  tags = var.default_tags  
+  tags = var.default_tags
 }
