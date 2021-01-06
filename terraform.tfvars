@@ -7,10 +7,11 @@ default_tags = {
   project : "Public-private-subnets"
 }
 
-
 # VPC
 vpc_cidr_block = "10.0.0.0/16"
 
+# subnet
+subnet_availability_zone = "eu-central-1a"
 
 # EC2
 ami_id            = "ami-0502e817a62226e03" // Ubuntu Server 20.04 LTS (HVM)
